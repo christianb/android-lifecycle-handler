@@ -55,3 +55,5 @@ Finally you can inject a lifecycle handler in your Fragment (or Activity).
 // injects a new handler with a LifecycleOwner as a parameter
 private val handler: Handler by inject { parametersOf(viewLifecycleOwner) }
 ```
+
+Thanks to [Ronaldo Pace](https://github.com/budius)
