@@ -19,11 +19,11 @@ private class LifecycleObververHandler(private val handler: Handler) : Lifecycle
 ## Add the LifecycleObserver to the LifecycleOwner
 Next we have to add the `LifecycleObververHandler` to a `LifecycleOwner`. We also wanna create these lifecycle observed handlers easily. So lets create a `LifecycleHandlerFactory`. 
 
-That factory gets created with a lambda `handlerFactory` that gives you an instance of a `Handler`. It has one function `create` that expects a `LifecycleOwner`.
+That factory gets created with a lambda `handlerFactory` that gives you an instance of a `Handler` (default is a `Handler` with a main Looper). It has one function `create` that expects a `LifecycleOwner`.
 
 Within that function it checks that the state of the `Lifecycle` is not `DESTROYED`. It calls the `handlerFactory` to get an instance of `Handler`. Then it creates a `LifecycleObserverHandler`, which takes the handler, and adds that `Observer` to the `LifecycleOwner`. Finally the `Handler` gets returned.
 ```
-class LifecycleHandlerFactory(private val handlerFactory: (() -> Handler)) {
+class LifecycleHandlerFactory(private val handlerFactory: (() -> Handler) = { Handler(Looper.getMainLooper()) }) {
 
 	fun create(owner: LifecycleOwner): Handler {
 		check(owner.lifecycle.currentState != Lifecycle.State.DESTROYED) {
@@ -38,12 +38,12 @@ class LifecycleHandlerFactory(private val handlerFactory: (() -> Handler)) {
 ```
 
 ## Inject the lifecycle aware Handler
-When you are using a DependendencyInjection Framework or a service locater like [Koin](https://insert-koin.io/) you can inject it.
+When you are using a DependendencyInjection Framework or a service locater like [Koin](https://insert-koin.io/) you can inject the lifecycle aware `Handler`.
 ```
 module {
   // a single instance of LifecycleHandlerFactory
   // it gets a lambda that every time its being called returnes a new Handler with a main looper.
-  single { LifecycleHandlerFactory { Handler(Looper.getMainLooper()) } }
+  single { LifecycleHandlerFactory() }
   
   // uses the LifecycleHandlerFactory to create a new handler with a LifecycleOwner as parameter.
   factory<Handler> { (lifecycleOwner: LifecycleOwner) -> get<LifecycleHandlerFactory>().create(lifecycleOwner) }
