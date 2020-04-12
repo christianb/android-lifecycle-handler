@@ -8,7 +8,7 @@ There is a simple solution to this. Bind your Handler to the lifecycle.
 First lets create a `LifecycleObserver` that gets a `Handler` instance.
 In the event of `Lifecycle.Event.ON_DESTROY` it will remove all callbacks and messages from that `Handler`.
 ```
-private class LifecycleObververHandler(private val handler: Handler) : LifecycleObserver {
+class LifecycleObververHandler(private val handler: Handler) : LifecycleObserver {
 	@OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
 	internal fun onDestroy() {
 		handler.removeCallbacksAndMessages(null)
